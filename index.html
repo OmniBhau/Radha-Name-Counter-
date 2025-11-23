@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RADHA Tap Count </title>
+<meta name="description" content="Offline Radha Tap Counter - Count your taps with beautiful Radha Krishna theme">
+<!-- Add manifest for offline capability -->
+<link rel="manifest" href="manifest.json">
+<style>
+:root{
+  --bg1:#0b0f1a;
+  --bg2:#111827;
+  --text:#fff;
+  --accent:#ff4081;
+  --accent-light:#ff79b0;
+}
+
+*{box-sizing:border-box;}
+html,body{
+  margin:0;height:100%;font-family:Arial, sans-serif;overflow:hidden;
+}
+
+body{
+  display:flex;justify-content:center;align-items:center;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  color:var(--text);
+}
+
+.stage{
+  width:100%;max-width:460px;height:100%;
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px;overflow:hidden;position:relative;
+}
+
+/* ---------- Top Title ---------- */
+.title {
+  margin-top: 40px;
+  font-size: 60px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-align: center;
+  
+  /* Glass / Liquid Text Effect */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  /* Glassy Shadow / Glow */
+  text-shadow: 
+    0 0 5px rgba(255, 255, 255, 0.4),
+    0 0 10px rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(0, 0, 0, 0.59);
+  
+  /* Smooth Transform */
+  transition: transform 0.3s ease, text-shadow 0.3s ease;
+  
+  /* Optional: animated shimmering */
+  position: relative;
+  overflow: hidden;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, rgba(255,255,255,0.2), rgba(47, 44, 44, 0.38), rgba(255,255,255,0.2));
+  transform: rotate(25deg);
+  animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(100%) rotate(25deg); }
+}
+
+.title:hover {
+  transform: scale(1.1);
+  text-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.6),
+    0 0 20px rgba(255, 255, 255, 0.4),
+    0 0 30px rgba(255, 64, 129, 0.3);
+}
+/* ---------- Glass Card Profile Icon Enhanced ---------- */
+.profile-btn {
+  position: absolute;
+  top: 15px;
+  right: 2px;
+  font-size: 15px;
+  cursor: pointer;
+  user-select: none;
+
+  /* Glass Card */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px 25px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.2); /* semi-transparent glass */
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+
+/* ---------- Premium Glass Gradient Icon ---------- */
+color: transparent;
+background: linear-gradient(145deg, rgba(255,255,255,0.8), rgba(220,220,255,0.4));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+
+/* Premium Glow / Frosted Effect */
+text-shadow: 
+  0 0 4px rgba(255, 255, 255, 0.6),
+  0 0 10px rgba(255, 255, 255, 0.5),
+  0 0 15px rgba(200, 200, 255, 0.4),
+  0 0 25px rgba(200, 200, 255, 0.3);
+
+/* Smooth Transition */
+transition: transform 0.3s ease, text-shadow 0.3s ease, color 0.3s ease;
+}
+
+.profile-btn:hover {
+  transform: scale(1.25);
+  text-shadow: 
+    0 0 6px rgba(255, 255, 255, 0.9),
+    0 0 12px rgba(255, 255, 255, 0.7),
+    0 0 20px rgba(200, 200, 255, 0.6),
+    0 0 35px rgba(200, 200, 255, 0.5);
+}
+
+.profile-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -10px; /* Extend glass below */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15); /* extra glass under */
+  filter: blur(8px);
+  z-index: -1;
+}
+
+/* ---------- Counter & Buttons ---------- */
+.counter-box{
+  display:flex;flex-direction:column;align-items:center;margin-top:12px;
+}
+
+#countDisplay{
+  font-size:50px;font-weight:800;
+  padding:6px 16px;border-radius:10px;
+  background:rgba(255,255,255,0.1);
+  margin-bottom:30px;
+  transition: all 0.3s ease;
+}
+
+#countDisplay.updated {
+  transform: scale(1.1);
+  background: rgba(255, 64, 129, 0.2);
+}
+
+.top-actions{
+  display:flex;gap:40px;
+}
+
+/* From Uiverse.io by cssbuttons-io */
+.action-btn {
+ --glow-color: rgba(188, 116, 255, 0.82);
+ --glow-spread-color: rgba(0, 0, 0, 0.8);
+ --enhanced-glow-color: rgb(231, 206, 255);
+ --btn-color: rgba(100, 61, 136, 0.53);
+ border: .25em solid var(--glow-color);
+ padding: 1em 3em;
+ color: var(--glow-color);
+ font-size: 15px;
+ font-weight: bold;
+ background-color: var(--btn-color);
+ border-radius: 1em;
+ outline: none;
+ box-shadow: 0 0 1em .25em var(--glow-color),
+        0 0 4em 1em var(--glow-spread-color),
+        inset 0 0 .75em .25em var(--glow-color);
+ text-shadow: 0 0 .5em var(--glow-color);
+ position: relative;
+ transition: all 0.3s;
+}
+
+.action-btn::after {
+ pointer-events: none;
+ content: "";
+ position: absolute;
+ top: 50%;
+ left: 0;
+ height: 100%;
+ width: 100%;
+ background-color: var(--glow-spread-color);
+ filter: blur(2em);
+ opacity: .7;
+ transform: perspective(1.5em) rotateX(35deg) scale(1, .6);
+}
+
+.action-btn:hover {
+ color: var(--btn-color);
+ background-color: var(--glow-color);
+ box-shadow: 0 0 1em .25em var(--glow-color),
+        0 0 4em 2em var(--glow-spread-color),
+        inset 0 0 .75em .25em var(--glow-color);
+}
+
+.action-btn:active {
+ box-shadow: 0 0 0.6em .25em var(--glow-color),
+        0 0 2.5em 2em var(--glow-spread-color),
+        inset 0 0 .5em .25em var(--glow-color);
+}
+
+/* TAP BUTTON with Spinner Effect */
+.btn-container {
+  margin-top: 110px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* From Uiverse.io by arshshaikh06 */
+.spinner {
+  background-image: linear-gradient(rgb(186, 66, 255) 35%,rgb(0, 225, 255));
+  width: 180px;
+  height: 180px;
+  animation: spinning82341 1.7s linear infinite, hue 1s ease-in-out infinite;
+  text-align: center;
+  border-radius: 50%;
+  filter: blur(1px);
+  box-shadow: 0px -5px 20px 0px rgb(186, 66, 255), 0px 5px 20px 0px rgb(0, 225, 255);
+  position: absolute;
+}
+
+.spinner1 {
+  background-color: rgb(36, 36, 36);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  filter: blur(10px);
+}
+
+@keyframes spinning82341 {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hue {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+.btn{
+  width:180px;height:180px;
+  border-radius:50%;border:none;
+  background:rgba(255,255,255,0.17);
+  font-size:28px;font-weight:900;cursor:pointer;
+  box-shadow:0 0 25px rgba(255,255,255,0.35);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+  color: white;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 35px rgba(255, 64, 129, 0.5);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.btn:active{
+  transform:scale(.95);
+  box-shadow: 0 0 15px rgba(255, 64, 129, 0.7);
+}
+
+/* QUOTES */
+#quoteBox{
+  margin-top:10px;
+  font-size:16px;color:#ffdde9;text-align:center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  min-height: 24px;
+}
+
+#quoteBox.show {
+  opacity: 1;
+}
+
+/* SAVE LIST POPUP */
+.popup{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  display:flex;justify-content:center;align-items:center;
+  visibility:hidden;opacity:0;transition:.3s;
+  z-index: 10;
+}
+.popup.active{visibility:visible;opacity:1;}
+
+.popup-box{
+  background:#151823;border-radius:12px;
+  width:90%;max-width:420px;max-height:80vh;
+  overflow:auto;padding:16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.popup.active .popup-box {
+  transform: translateY(0);
+}
+
+.save-title{text-align:center;font-size:22px;margin-bottom:10px;font-weight:700;}
+.save-item{
+  padding:12px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  margin-bottom: 5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.save-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Selection styles for saved items */
+.save-item.selected {
+  background: rgba(255, 64, 129, 0.2);
+  border-left: 4px solid var(--accent);
+}
+
+.selection-mode .save-item {
+  cursor: pointer;
+}
+
+.selection-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.delete-btn {
+  padding: 8px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+  background: var(--accent-light);
+  transform: translateY(-2px);
+}
+
+.cancel-select-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.cancel-select-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+/* RADHA RAIN - Straight down without rotation */
+.rain-area{
+  position:absolute;inset:0;pointer-events:none;z-index:5;
+}
+.drop{
+  position:absolute;font-weight:900;
+  font-size:25px;animation:fall linear forwards;
+  user-select: none;
+  /* Neon blur effect */
+  text-shadow: 
+    0 0 5px #fff,
+    0 0 10px #fff,
+    0 0 15px #ff4081,
+    0 0 20px #ff4081,
+    0 0 25px #ff4081;
+  filter: blur(0.1px);
+}
+@keyframes fall{
+  0%{transform:translateY(-10vh);opacity:1;}
+  100%{transform:translateY(110vh);opacity:0;}
+}
+
+/* PARTICLES */
+#particleCanvas{
+  position:absolute;inset:0;pointer-events:none !important;z-index:1;
+}
+
+/* Notification */
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: rgba(231, 231, 231, 0.75);
+  color: rgba(0, 0, 0, 1);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  z-index: 100;
+  transition: transform 0.5s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.notification.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Offline indicator */
+.offline-indicator {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: none;
+}
+
+.offline-indicator.show {
+  display: block;
+}
+/* Social Media Buttons - Right Side */
+.social-card {
+  position: fixed;
+  left: 10px;
+  top: 74%;
+  transform: translateY(-10%);
+  max-width: fit-content;
+  border-radius: 40px;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  gap: 1rem;
+  backdrop-filter: blur(2px);
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.192),
+    inset 0 0 5px rgba(255, 255, 255, 0.274), 0 5px 5px rgba(0, 0, 0, 0.164);
+  transition: 0.5s;
+  z-index: 100;
+}
+
+.social-card:hover {
+  animation: ease-out 5s;
+  background: rgba(173, 173, 173, 0.05);
+}
+
+.social-card ul {
+  padding: 0.4rem;
+  display: flex;
+  list-style: none;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.social-card ul li {
+  cursor: pointer;
+}
+
+.svg {
+  transition: all 0.3s;
+  padding: 0.5rem;
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+  color: rgb(255, 174, 0);
+  fill: currentColor;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3),
+    inset 0 0 5px rgba(255, 255, 255, 0.5), 0 5px 5px rgba(0, 0, 0, 0.164);
+}
+
+.text {
+  opacity: 0;
+  border-radius: 5px;
+  padding: 5px;
+  transition: all 0.3s;
+  color: rgb(255, 174, 0);
+  background-color: rgba(255, 255, 255, 0.3);
+  position: absolute;
+  z-index: 9999;
+  box-shadow: -5px 0 1px rgba(153, 153, 153, 0.2),
+    -10px 0 1px rgba(153, 153, 153, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.3),
+    inset 0 0 5px rgba(255, 255, 255, 0.5), 0 5px 5px rgba(0, 0, 0, 0.082);
+}
+
+/*isometric projection*/
+.iso-pro {
+  transition: 0.5s;
+  position: relative;
+}
+.iso-pro:hover a > .svg {
+  transform: translate(15px, -15px);
+  border-radius: 100%;
+}
+
+.iso-pro:hover .text {
+  opacity: 1;
+  transform: translate(25px, -2px) skew(-5deg);
+}
+
+.iso-pro:hover .svg {
+  transform: translate(5px, -5px);
+}
+
+.iso-pro span {
+  opacity: 0;
+  position: absolute;
+  color: #1877f2;
+  border-color: #1877f2;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3),
+    inset 0 0 5px rgba(255, 255, 255, 0.5), 0 5px 5px rgba(0, 0, 0, 0.164);
+  border-radius: 50%;
+  transition: all 0.3s;
+  height: 60px;
+  width: 60px;
+}
+
+.iso-pro:hover span {
+  opacity: 1;
+}
+
+.iso-pro:hover span:nth-child(1) {
+  opacity: 0.2;
+}
+
+.iso-pro:hover span:nth-child(2) {
+  opacity: 0.4;
+  transform: translate(5px, -5px);
+}
+
+.iso-pro:hover span:nth-child(3) {
+  opacity: 0.6;
+  transform: translate(10px, -10px);
+}
+
+</style>
+</head>
+
+<body>
+<div class="social-card">
+  <ul>
+    <li class="iso-pro">
+      <span></span>
+      <span></span>
+      <span></span>
+      <a href="https://t.me/yt_nitish916" target="_blank">
+        <svg
+          class="svg"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 496 512"
+        >
+          <path
+            d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm121.8 169.9l-40.7 191.8c-3 13.6-11.1 16.9-22.4 10.5l-62-45.7-29.9 28.8c-3.3 3.3-6.1 6.1-12.5 6.1l4.4-63.1 114.9-103.8c5-4.4-1.1-6.9-7.7-2.5l-142 89.4-61.2-19.1c-13.3-4.2-13.6-13.3 2.8-19.7l239.1-92.2c11.1-4 20.8 2.7 17.2 19.5z"
+          ></path>
+        </svg>
+      </a>
+      <div class="text">Telegram</div>
+    </li>
+    <li class="iso-pro">
+      <span></span>
+      <span></span>
+      <span></span>
+      <a href="https://youtube.com/@omni_bhau?si=EUDoYBKr6HrwLUIL" target="_blank">
+        <svg
+          class="svg"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 576 512"
+        >
+          <path
+            d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"
+          ></path>
+        </svg>
+      </a>
+      <div class="text">YouTube</div>
+    </li>
+    <li class="iso-pro">
+      <span></span>
+      <span></span>
+      <span></span>
+      <a href="https://www.instagram.com/yt_nitish916?igsh=bms1aDh1ejdud3R1" target="_blank">
+        <svg
+          class="svg"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 448 512"
+        >
+          <path
+            d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"
+          ></path>
+        </svg>
+      </a>
+      <div class="text">Instagram</div>
+    </li>
+  </ul>
+</div>
+<div class="stage">
+
+  <!-- Profile icon -->
+  <div class="profile-btn" id="profileBtn">👤</div>
+
+  <!-- Title -->
+  <div class="title">RADHA</div>
+
+  <!-- Counter + Buttons -->
+  <div class="counter-box">
+    <div id="countDisplay">0</div>
+    <div class="top-actions">
+      <button id="resetBtn" class="action-btn">Reset</button>
+      <button id="saveBtn" class="action-btn">Save</button>
+    </div>
+  </div>
+
+  <!-- Tap Button with Spinner -->
+  <div class="btn-container">
+    <div class="spinner">
+      <div class="spinner1"></div>
+    </div>
+    <button id="rainBtn" class="btn">TAP</button>
+  </div>
+
+  <div id="quoteBox"></div>
+
+  <div id="rainArea" class="rain-area"></div>
+  <canvas id="particleCanvas"></canvas>
+
+</div>
+
+<!-- POPUP SAVE LIST -->
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <div class="save-title">Saved Taps</div>
+    <div id="saveList">No saved data yet</div>
+  </div>
+</div>
+
+<!-- Notification -->
+<div class="notification" id="notification"></div>
+
+<!-- Offline Indicator -->
+<div class="offline-indicator" id="offlineIndicator">🔴 Offline</div>
+
+<script>
+/* Service Worker Registration for Offline Functionality */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js').then(function(registration) {
+      console.log('ServiceWorker registration successful');
+    }, function(err) {
+      console.log('ServiceWorker registration failed: ', err);
+    });
+  });
+}
+
+/* Offline Detection */
+window.addEventListener('online', function() {
+  document.getElementById('offlineIndicator').classList.remove('show');
+});
+
+window.addEventListener('offline', function() {
+  document.getElementById('offlineIndicator').classList.add('show');
+});
+
+// Check initial status
+if (!navigator.onLine) {
+  document.getElementById('offlineIndicator').classList.add('show');
+}
+
+/* Variables */
+let count = Number(localStorage.getItem("radha_count")||0);
+let saved = JSON.parse(localStorage.getItem("radha_saved")||"[]");
+const quotes=[
+"Radha Krishna ka pyaar infinite Hai .",
+"Shanti tabhi shuru hoti hai jab Krishna dil mei ho.",
+"Sacha pyaar hai surrender, pure aur boundless.",
+"Prem hi Paramarth hai — pyaar hi sabse bada sach hai.",
+"Radhe , Radhe "
+];
+
+/* SELECTION MODE VARIABLES */
+let isSelectionMode = false;
+let selectedItems = [];
+
+/* DOM */
+const countBox=document.getElementById("countDisplay");
+const btn=document.getElementById("rainBtn");
+const rain=document.getElementById("rainArea");
+const quote=document.getElementById("quoteBox");
+const saveList=document.getElementById("saveList");
+const notification = document.getElementById("notification");
+
+/* Initialize */
+countBox.textContent=count;
+renderSaved();
+
+/* TAP event */
+btn.addEventListener("click",()=>{
+ count++;
+ countBox.textContent=count;
+ localStorage.setItem("radha_count",count);
+ 
+ // Add visual feedback
+ countBox.classList.add('updated');
+ setTimeout(() => countBox.classList.remove('updated'), 300);
+
+ if(navigator.vibrate)navigator.vibrate(30);
+ playTone();
+ createDrop();
+ if(count%20===0) showQuote();
+});
+
+/* RESET */
+document.getElementById("resetBtn").addEventListener("click",()=>{
+ if(confirm("Reset counter?")){
+   count=0;
+   localStorage.setItem("radha_count",0);
+   countBox.textContent=0;
+   showNotification("Counter reset successfully");
+ }
+});
+
+/* SAVE */
+document.getElementById("saveBtn").addEventListener("click",()=>{
+  // Custom confirmation notification
+  if(confirm("Do you want to save this score?")){
+      const now=new Date();
+      const formatted = `${now.toLocaleString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})} — ${now.toDateString()}`;
+
+      saved.push({score:count,time:formatted});
+      localStorage.setItem("radha_saved",JSON.stringify(saved));
+      renderSaved();
+
+      showNotification("Score saved successfully 🎉");
+  } else {
+      // cancelled
+      showNotification("Save cancelled ❌");
+  }
+});
+
+// SHOW POPUP
+const popup=document.getElementById("popup");
+document.getElementById("profileBtn").addEventListener("click",()=>{
+ popup.classList.toggle("active");
+});
+
+// Close popup when clicking outside the box
+popup.addEventListener("click", (e) => {
+  if(e.target === popup){
+    popup.classList.remove("active");
+    // Exit selection mode when closing popup
+    if(isSelectionMode) {
+      cancelSelection();
+    }
+  }
+});
+
+/* Render saved */
+function renderSaved(){
+ if(saved.length===0){
+   saveList.innerHTML="No saved data yet";
+   return;
+ }
+ 
+ saveList.innerHTML="";
+ saved.sort((a,b)=>b.score-a.score);
+ 
+ saved.forEach((s, index)=>{
+   const d=document.createElement("div");
+   d.className="save-item";
+   d.innerHTML=`
+     <div style="display: flex; justify-content: between; align-items: center;">
+       <div>
+         <strong>${s.score} Taps</strong><br>
+         <div class="save-date">${s.time}</div>
+       </div>
+       <button class="delete-single-btn" data-index="${index}" style="
+         background: var(--accent);
+         color: white;
+         border: none;
+         border-radius: 5px;
+         padding: 5px 10px;
+         cursor: pointer;
+         font-size: 12px;
+         margin-left: 10px;
+       ">Delete</button>
+     </div>
+   `;
+   
+   // Single delete button event
+   const deleteBtn = d.querySelector('.delete-single-btn');
+   deleteBtn.addEventListener('click', function(e) {
+     e.stopPropagation();
+     deleteSingleItem(index);
+   });
+   
+   // Add long press event for selection mode
+   let pressTimer;
+   d.addEventListener('mousedown', startPress);
+   d.addEventListener('touchstart', startPress);
+   d.addEventListener('mouseup', cancelPress);
+   d.addEventListener('mouseleave', cancelPress);
+   d.addEventListener('touchend', cancelPress);
+   
+   function startPress(e) {
+     // Don't trigger long press if clicking delete button
+     if (e.target.classList.contains('delete-single-btn')) return;
+     e.preventDefault();
+     pressTimer = setTimeout(() => {
+       toggleSelectionMode();
+       toggleItemSelection(index, d);
+     }, 500); // 500ms hold
+   }
+   
+   function cancelPress() {
+     clearTimeout(pressTimer);
+   }
+   
+   // Click to select in selection mode
+   d.addEventListener('click', (e) => {
+     // Don't trigger selection if clicking delete button
+     if (e.target.classList.contains('delete-single-btn')) return;
+     if(isSelectionMode) {
+       toggleItemSelection(index, d);
+     }
+   });
+   
+   saveList.appendChild(d);
+ });
+ 
+ // Add selection actions if in selection mode
+ if(isSelectionMode) {
+   addSelectionActions();
+ }
+}
+
+/* Delete single item function */
+function deleteSingleItem(index) {
+  if(confirm("Delete this saved item?")) {
+    saved.splice(index, 1);
+    localStorage.setItem("radha_saved", JSON.stringify(saved));
+    renderSaved();
+    showNotification("Item deleted successfully");
+  }
+}
+
+/* SELECTION MODE FUNCTIONS */
+function toggleSelectionMode() {
+  isSelectionMode = true;
+  document.querySelector('.popup-box').classList.add('selection-mode');
+  
+  // Add selection actions immediately
+  addSelectionActions();
+  showNotification("Selection mode activated - Tap items to select");
+}
+
+function toggleItemSelection(index, element) {
+  const itemIndex = selectedItems.indexOf(index);
+  
+  if(itemIndex === -1) {
+    // Select item
+    selectedItems.push(index);
+    element.classList.add('selected');
+  } else {
+    // Deselect item
+    selectedItems.splice(itemIndex, 1);
+    element.classList.remove('selected');
+  }
+  
+  // Update selection actions
+  updateSelectionActions();
+}
+
+function addSelectionActions() {
+  // Remove existing actions if any
+  const existingActions = document.querySelector('.selection-actions');
+  if(existingActions) {
+    existingActions.remove();
+  }
+  
+  // Add selection actions
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'selection-actions';
+  actionsDiv.innerHTML = `
+    <button class="delete-btn" id="deleteSelected">Delete Selected (0)</button>
+    <button class="cancel-select-btn" id="cancelSelection">Cancel Selection</button>
+  `;
+  
+  document.querySelector('.popup-box').appendChild(actionsDiv);
+  
+  // Add event listeners
+  document.getElementById('deleteSelected').addEventListener('click', deleteSelectedItems);
+  document.getElementById('cancelSelection').addEventListener('click', cancelSelection);
+  
+  // Update button text initially
+  updateSelectionActions();
+}
+
+function updateSelectionActions() {
+  const deleteBtn = document.getElementById('deleteSelected');
+  if(deleteBtn) {
+    deleteBtn.textContent = `Delete Selected (${selectedItems.length})`;
+    
+    // Disable delete button if no items selected
+    if(selectedItems.length === 0) {
+      deleteBtn.disabled = true;
+      deleteBtn.style.opacity = "0.6";
+    } else {
+      deleteBtn.disabled = false;
+      deleteBtn.style.opacity = "1";
+    }
+  }
+}
+
+function deleteSelectedItems() {
+  if(selectedItems.length === 0) return;
+  
+  if(confirm(`Delete ${selectedItems.length} selected item(s)? This action cannot be undone.`)) {
+    // Sort in descending order to avoid index issues when deleting
+    selectedItems.sort((a, b) => b - a);
+    
+    // Remove selected items from saved array
+    selectedItems.forEach(index => {
+      saved.splice(index, 1);
+    });
+    
+    // Update localStorage
+    localStorage.setItem("radha_saved", JSON.stringify(saved));
+    
+    // Exit selection mode and refresh
+    cancelSelection();
+    renderSaved();
+    
+    showNotification(`${selectedItems.length} item(s) deleted successfully`);
+  }
+}
+
+function cancelSelection() {
+  isSelectionMode = false;
+  selectedItems = [];
+  document.querySelector('.popup-box').classList.remove('selection-mode');
+  
+  // Remove selection actions
+  const actionsDiv = document.querySelector('.selection-actions');
+  if(actionsDiv) {
+    actionsDiv.remove();
+  }
+  
+  // Re-render to remove selection highlights
+  renderSaved();
+  showNotification("Selection mode cancelled");
+}
+
+/* Rain - Straight down without rotation */
+function createDrop(){
+ const d=document.createElement("div");
+ d.className="drop";
+ d.innerText="राधे";
+ d.style.left=(Math.random()*80+10)+"%";
+ d.style.color=`hsl(${Math.random()*360},85%,60%)`;
+ d.style.animationDuration=(7+Math.random()*2)+"s";
+ rain.appendChild(d);
+ setTimeout(()=>d.remove(),10000);
+}
+
+/* Quotes */
+function showQuote(){
+ quote.innerText=quotes[(count/20)%quotes.length];
+ quote.classList.add('show');
+ setTimeout(() => {
+   quote.classList.remove('show');
+ }, 3000);
+}
+
+/* Sound */
+let ctx;
+try {
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+} catch(e) {
+  console.log("Web Audio API not supported");
+}
+
+function playTone(){
+  if(!ctx) return;
+  
+  try {
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.frequency.value=380+Math.random()*150;
+    g.gain.value=.18;
+    o.start();setTimeout(()=>{o.stop()},150);
+  } catch(e) {
+    console.log("Audio playback failed");
+  }
+}
+
+/* Notification */
+function showNotification(message) {
+  notification.textContent = message;
+  notification.classList.add('show');
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+  }, 3000);
+}
+
+/* Smooth particles */
+const c=document.getElementById("particleCanvas");
+const ct=c.getContext("2d");
+function resizeCanvas(){c.width=window.innerWidth;c.height=window.innerHeight;}
+resizeCanvas(); window.onresize=resizeCanvas;
+
+let parts=[];
+for(let i=0;i<50;i++){
+ parts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:1+Math.random()*3,vx:(Math.random()-.5)*.4,vy:.1+Math.random()*.3});
+}
+function draw(){
+ ct.clearRect(0,0,c.width,c.height);
+ ct.fillStyle="rgba(255,255,255,.25)";
+ parts.forEach(p=>{
+   ct.beginPath();ct.arc(p.x,p.y,p.r,0,Math.PI*2);ct.fill();
+   p.x+=p.vx;p.y+=p.vy;
+   if(p.y>c.height)p.y=-5; if(p.x>c.width)p.x=0; if(p.x<0)p.x=c.width;
+ });
+ requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
